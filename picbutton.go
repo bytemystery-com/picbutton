@@ -1,3 +1,9 @@
+// Implements a button (normal push button or toggle button) with
+// customer provided pictures for up, down and inactive state
+// if inactive pictures are missing they will be generated from the provided up and down pictures.
+// you can also specify which mouse button can be used to press / toggle the button
+// also the keyboard keyState can be retrieved for implementing click + Ctrl
+
 package picbutton
 
 import (
@@ -241,8 +247,8 @@ func (p *PicButton) TypedKey(ev *fyne.KeyEvent) {
 func (p *PicButton) TypedRune(r rune) {
 }
 
-// //////////////////////////////////////
 // User functions
+
 // Sets the button in down state - no Tapped event is triggered
 func (b *PicButton) SetDown(bDown bool) {
 	if b.isDown != bDown {
