@@ -1,0 +1,329 @@
+package picbutton
+
+import (
+	"bytes"
+	"image"
+	"image/png"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/widget"
+)
+
+type noCopy struct{}
+
+var (
+	_ fyne.Widget        = (*PicButton)(nil)
+	_ fyne.Tappable      = (*PicButton)(nil)
+	_ desktop.Mouseable  = (*PicButton)(nil)
+	_ desktop.Hoverable  = (*PicButton)(nil)
+	_ desktop.Cursorable = (*PicButton)(nil)
+	_ fyne.Focusable     = (*PicButton)(nil)
+	_ fyne.Tappable      = (*PicButton)(nil)
+
+	_ fyne.WidgetRenderer = (*PicButtonRenderer)(nil)
+)
+
+// Button (normal push button or toggle button) with pictures for up, down and inactive state
+// Implements
+//   - fyne.Widget
+//   - fyne.Tappable
+//   - fyne.Focusable
+//   - desktop.Mouseable
+//   - desktop.Hoverable
+//   - desktop.Cursorable
+
+type PicButton struct {
+	noCopy noCopy // so `go vet` can complain if a widget is passed by value (copied)
+
+	widget.BaseWidget
+	img_u           fyne.Resource
+	img_d           fyne.Resource
+	img_ux          fyne.Resource
+	img_dx          fyne.Resource
+	minSize         fyne.Size
+	buttonMask      desktop.MouseButton
+	lastKeyModifier fyne.KeyModifier
+
+	isEnabled         bool
+	isDown            bool
+	stateIsDown       bool
+	mouseDowninButton bool
+	isToggle          bool
+
+	onTapped func()
+}
+
+// creates a new picture button widget.
+// At least uImg and dImg must be given
+// If buttonMask is 0 then MouseButtonPrimary is used
+func NewPicButton(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, buttonMask desktop.MouseButton, tapped func()) *PicButton {
+	if dImg == nil || uImg == nil {
+		return nil
+	}
+	res_u := fyne.NewStaticResource("u_pic", uImg)
+	res_d := fyne.NewStaticResource("d_pic", dImg)
+	var res_ux, res_dx *fyne.StaticResource
+
+	if uxImg == nil {
+		uxImg = createGray(uImg)
+	}
+	if uxImg == nil {
+		return nil
+	} else {
+		res_ux = fyne.NewStaticResource("ux_pic", uxImg)
+	}
+
+	if dxImg == nil {
+		dxImg = createGray(dImg)
+	}
+	if dxImg == nil {
+		return nil
+	} else {
+		res_dx = fyne.NewStaticResource("dx_pic", dxImg)
+	}
+
+	img, _, err := image.Decode(bytes.NewReader(uImg))
+	if err != nil {
+		return nil
+	}
+	bm := buttonMask
+	if bm == 0 {
+		bm = desktop.MouseButtonPrimary
+	}
+
+	w := &PicButton{
+		onTapped:   tapped,
+		img_u:      res_u,
+		img_d:      res_d,
+		img_ux:     res_ux,
+		img_dx:     res_dx,
+		minSize:    fyne.NewSize(float32(img.Bounds().Dx()), float32(img.Bounds().Dy())),
+		isToggle:   isToggle,
+		isEnabled:  true,
+		buttonMask: bm,
+	}
+	w.ExtendBaseWidget(w)
+	return w
+}
+
+// creates a grayscale image
+func createGray(buf []byte) []byte {
+	src, _, err := image.Decode(bytes.NewReader(buf))
+	if err != nil {
+		return nil
+	}
+	bounds := src.Bounds()
+	gray := image.NewGray(bounds)
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			gray.Set(x, y, src.At(x, y))
+		}
+	}
+
+	buf2 := bytes.Buffer{}
+	err = png.Encode(&buf2, gray)
+	if err != nil {
+		return nil
+	}
+	return buf2.Bytes()
+}
+
+// Widget interface
+func (p *PicButton) CreateRenderer() fyne.WidgetRenderer {
+	imgu := canvas.NewImageFromResource(p.img_u)
+	imgu.FillMode = canvas.ImageFillStretch
+	r := &PicButtonRenderer{
+		w:    p,
+		img:  imgu,
+		objs: []fyne.CanvasObject{imgu},
+	}
+	return r
+}
+
+// Tappable interface
+func (p *PicButton) Tapped(ev *fyne.PointEvent) {
+	if p.isEnabled && ((p.buttonMask & desktop.MouseButtonPrimary) == desktop.MouseButtonPrimary) {
+		if p.onTapped != nil {
+			p.onTapped()
+		}
+	}
+}
+
+// Mouseable interface
+func (p *PicButton) MouseDown(ev *desktop.MouseEvent) {
+	if p.isEnabled && (ev.Button&p.buttonMask != 0) {
+		if p.isToggle {
+			p.isDown = !p.isDown
+		} else {
+			p.isDown = true
+		}
+		p.stateIsDown = p.isDown
+		p.mouseDowninButton = true
+		p.Refresh()
+	}
+}
+
+// Mouseable interface
+func (p *PicButton) MouseUp(ev *desktop.MouseEvent) {
+	if p.isEnabled && (ev.Button&p.buttonMask != 0) {
+		if !p.isToggle {
+			p.isDown = false
+			p.stateIsDown = p.isDown
+			p.lastKeyModifier = ev.Modifier
+			if p.onTapped != nil && (ev.Button&desktop.MouseButtonPrimary == 0) {
+				p.onTapped()
+			}
+			p.Refresh()
+		} else {
+			if p.onTapped != nil {
+				p.lastKeyModifier = ev.Modifier
+				if ev.Button&desktop.MouseButtonPrimary == 0 {
+					p.onTapped()
+				}
+			}
+		}
+		p.mouseDowninButton = false
+	}
+}
+
+// Hoverable interface
+func (p *PicButton) MouseOut() {
+	if p.isEnabled {
+		if p.mouseDowninButton {
+			if p.isDown {
+				p.isDown = false
+				p.Refresh()
+			}
+			p.mouseDowninButton = false
+		}
+	}
+}
+
+// Hoverable interface
+func (p *PicButton) MouseIn(ev *desktop.MouseEvent) {
+}
+
+// Hoverable interface
+func (p *PicButton) MouseMoved(ev *desktop.MouseEvent) {
+}
+
+// Cursorable interface
+func (p *PicButton) Cursor() desktop.Cursor {
+	if p.isEnabled {
+		return desktop.PointerCursor
+	} else {
+		return desktop.DefaultCursor
+	}
+}
+
+// Focusable interface
+func (p *PicButton) FocusGained() {
+	p.Refresh()
+}
+
+// Focusable interface
+func (p *PicButton) FocusLost() {
+	p.Refresh()
+}
+
+// Focusable interface
+func (p *PicButton) TypedKey(ev *fyne.KeyEvent) {
+	if (ev.Name == fyne.KeyReturn || ev.Name == fyne.KeySpace) &&
+		p.isEnabled && ((p.buttonMask & desktop.MouseButtonPrimary) == desktop.MouseButtonPrimary) &&
+		p.onTapped != nil {
+		p.onTapped()
+	}
+}
+
+// Focusable interface
+func (p *PicButton) TypedRune(r rune) {
+}
+
+// //////////////////////////////////////
+// User functions
+// Sets the button in down state - no Tapped event is triggered
+func (b *PicButton) SetDown(bDown bool) {
+	if b.isDown != bDown {
+		b.isDown = bDown
+		b.stateIsDown = true
+		b.Refresh()
+	}
+}
+
+// Checks if the button (used in toggle mode) is down
+func (b *PicButton) IsDown() bool {
+	return b.isDown
+}
+
+// Sets the button enabled / disabled
+func (b *PicButton) SetEnabled(bEnabled bool) {
+	if b.isEnabled != bEnabled {
+		b.isEnabled = bEnabled
+		b.Refresh()
+	}
+}
+
+// Checks if the button is enabled
+func (b *PicButton) IsEnabled() bool {
+	return b.isEnabled
+}
+
+// Get the last keyboard modifier
+func (p *PicButton) GetLastkeyModifier() fyne.KeyModifier {
+	return p.lastKeyModifier
+}
+
+// Override the automatic vrom uImg derived minSize
+func (p *PicButton) SetMinSize(minSize fyne.Size) {
+	p.minSize = minSize
+	p.Refresh()
+}
+
+// PicButtonRenderer implements:
+//   - fyne.WidgetRenderer
+type PicButtonRenderer struct {
+	w    *PicButton
+	img  *canvas.Image
+	objs []fyne.CanvasObject
+}
+
+// WidgetRenderer interface
+func (r *PicButtonRenderer) Layout(size fyne.Size) {
+	r.img.Resize(fyne.NewSize(size.Width, size.Height))
+	r.img.Move(fyne.NewPos(0, 0))
+}
+
+// WidgetRenderer interface
+func (r *PicButtonRenderer) MinSize() fyne.Size {
+	return r.w.minSize
+}
+
+// WidgetRenderer interface
+func (r *PicButtonRenderer) Refresh() {
+	if r.w.isEnabled {
+		if r.w.isDown {
+			r.img.Resource = r.w.img_d
+		} else {
+			r.img.Resource = r.w.img_u
+		}
+	} else {
+		if r.w.isDown {
+			r.img.Resource = r.w.img_dx
+		} else {
+			r.img.Resource = r.w.img_ux
+		}
+	}
+	r.objs = []fyne.CanvasObject{r.img}
+	r.img.Refresh()
+}
+
+// WidgetRenderer interface
+func (r *PicButtonRenderer) Destroy() {
+}
+
+// WidgetRenderer interface
+func (r *PicButtonRenderer) Objects() []fyne.CanvasObject {
+	return r.objs
+}
