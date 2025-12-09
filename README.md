@@ -5,6 +5,8 @@ if inactive pictures are missing they will be generated from the provided up and
 you can also specify which mouse button can be used to press / toggle the button  
 also the keyboard keyState can be retrieved for implementing click + Ctrl  
 
+Author: Reiner Pröls  
+Licence: MIT  
 
 Example:
 ```
