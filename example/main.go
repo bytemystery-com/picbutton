@@ -4,7 +4,7 @@ import (
 	"embed"
 	"fmt"
 
-	"bytemystery-com/picbutton"
+	"github.com/bytemystery-com/picbutton"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"

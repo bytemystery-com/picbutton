@@ -14,7 +14,7 @@ Licence: MIT
 `go get github.com/bytemystery-com/picbutton`
 
 ## Import PicButton
-`bytemystery-com/picbutton`
+`import github.com/bytemystery-com/picbutton`
 
 ## Usage of PicButton
 `button := picbutton.NewPicButton(imgUp, imgDown, imgUpX, imgDownX, false, 0, func() {// Do what has to be done})`
@@ -27,7 +27,7 @@ import (
 	"embed"
 	"fmt"
 
-	"bytemystery-com/picbutton"
+	"github.com/bytemystery-com/picbutton"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
