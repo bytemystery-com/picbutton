@@ -1,11 +1,11 @@
 # PicButton for [fyne](https://fyne.io/)
-// Implements a button (normal push button or toggle button) with
-// customer provided pictures for up, down and inactive state
-// if inactive pictures are missing they will be generated from the provided up and down pictures.
-// Pictures can be changed on the fly.
-// You can also specify which mouse button can be used to press / toggle the button.
-// Also the keyboard keyState and used Mouse button can be retrieved for implementing click + Ctrl
-// or right click + Shift.
+Implements a button (normal push button or toggle button) with  
+customer provided pictures for up, down and inactive state  
+if inactive pictures are missing they will be generated from the provided up and down pictures.  
+Pictures can be changed on the fly.  
+You can also specify which mouse button can be used to press / toggle the button.  
+Also the keyboard keyState and used Mouse button can be retrieved for implementing click + Ctrl  
+or right click + Shift.  
 
 Author: Reiner Pröls  
 Licence: MIT  
