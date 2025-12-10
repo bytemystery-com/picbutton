@@ -11,10 +11,10 @@ Author: Reiner Pröls
 Licence: MIT  
 
 ## Getting PicButton
-`go get https://github.com/Reiner1210/picbutton`
+`go get github.com/bytemystery-com/picbutton`
 
 ## Import PicButton
-`bytemystery.com/picbutton`
+`bytemystery-com/picbutton`
 
 ## Usage of PicButton
 `button := picbutton.NewPicButton(imgUp, imgDown, imgUpX, imgDownX, false, 0, func() {// Do what has to be done})`
@@ -27,7 +27,7 @@ import (
 	"embed"
 	"fmt"
 
-	"bytemystery.com/picbutton"
+	"bytemystery-com/picbutton"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"

@@ -1,4 +1,4 @@
-module bytemystery.com/picbutton
+module bytemystery-com/picbutton
 
 go 1.25.5
 
