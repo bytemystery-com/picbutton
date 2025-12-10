@@ -28,17 +28,20 @@ func main() {
 	a := app.New()
 	w := a.NewWindow("-Test-")
 
-	imgUp, _ := content.ReadFile("assets/img_u.png")
-	imgDown, _ := content.ReadFile("assets/img_d.png")
-	imgUpX, _ := content.ReadFile("assets/img_ux.png")
-	imgDownX, _ := content.ReadFile("assets/img_dv.png")
+	imgPlayUp, _ := content.ReadFile("assets/play_u.png")
+	imgPlayDown, _ := content.ReadFile("assets/play_d.png")
+	imgPlayUpX, _ := content.ReadFile("assets/play_ux.png")
+	imgPlayDownX, _ := content.ReadFile("assets/play_dv.png")
+
+	imgStopUp, _ := content.ReadFile("assets/stop_u.png")
+	imgStopDown, _ := content.ReadFile("assets/stop_d.png")
 
 	var button1 *picbutton.PicButton
 	var button2 *picbutton.PicButton
-	button1 = picbutton.NewPicButton(imgUp, imgDown, imgUpX, imgDownX, false, 0, func() {
+	button1 = picbutton.NewPicButton(imgPlayUp, imgPlayDown, imgPlayUpX, imgPlayDownX, true, 0, func() {
 		fmt.Println("Add click", button1.GetLastkeyModifier())
 	})
-	button2 = picbutton.NewPicButton(imgUp, imgDown, nil, nil, true, 0, func() {
+	button2 = picbutton.NewPicButton(imgStopUp, imgStopDown, nil, nil, false, 0, func() {
 		fmt.Println("Add click", button2.GetLastkeyModifier())
 	})
 
