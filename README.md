@@ -11,10 +11,14 @@ Author: Reiner Pröls
 Licence: MIT  
 
 ## Getting PicButton
-`go get github.com/bytemystery-com/picbutton`
+```go
+go get github.com/bytemystery-com/picbutton
+```
 
 ## Import PicButton
-`import github.com/bytemystery-com/picbutton`
+```go
+import github.com/bytemystery-com/picbutton`
+```
 
 ## Usage of PicButton
 ```go
@@ -112,37 +116,73 @@ import "github.com/bytemystery-com/picbutton"
 
 ## Index
 
-- [type PicButton](<#PicButton>)
-  - [func NewPicButton\(uImg \[\]byte, dImg \[\]byte, uxImg \[\]byte, dxImg \[\]byte, isToggle bool, buttonMask desktop.MouseButton, tapped func\(\)\) \*PicButton](<#NewPicButton>)
-  - [func \(p \*PicButton\) CreateRenderer\(\) fyne.WidgetRenderer](<#PicButton.CreateRenderer>)
-  - [func \(p \*PicButton\) Cursor\(\) desktop.Cursor](<#PicButton.Cursor>)
-  - [func \(p \*PicButton\) FocusGained\(\)](<#PicButton.FocusGained>)
-  - [func \(p \*PicButton\) FocusLost\(\)](<#PicButton.FocusLost>)
-  - [func \(p \*PicButton\) GetLastKeyModifier\(\) fyne.KeyModifier](<#PicButton.GetLastKeyModifier>)
-  - [func \(p \*PicButton\) GetLastMouseButton\(\) desktop.MouseButton](<#PicButton.GetLastMouseButton>)
-  - [func \(b \*PicButton\) IsDown\(\) bool](<#PicButton.IsDown>)
-  - [func \(b \*PicButton\) IsEnabled\(\) bool](<#PicButton.IsEnabled>)
-  - [func \(p \*PicButton\) MouseDown\(ev \*desktop.MouseEvent\)](<#PicButton.MouseDown>)
-  - [func \(p \*PicButton\) MouseIn\(ev \*desktop.MouseEvent\)](<#PicButton.MouseIn>)
-  - [func \(p \*PicButton\) MouseMoved\(ev \*desktop.MouseEvent\)](<#PicButton.MouseMoved>)
-  - [func \(p \*PicButton\) MouseOut\(\)](<#PicButton.MouseOut>)
-  - [func \(p \*PicButton\) MouseUp\(ev \*desktop.MouseEvent\)](<#PicButton.MouseUp>)
-  - [func \(p \*PicButton\) SetDImg\(dImg \[\]byte\) error](<#PicButton.SetDImg>)
-  - [func \(b \*PicButton\) SetDown\(bDown bool\)](<#PicButton.SetDown>)
-  - [func \(p \*PicButton\) SetDxImg\(dxImg \[\]byte\) error](<#PicButton.SetDxImg>)
-  - [func \(b \*PicButton\) SetEnabled\(bEnabled bool\)](<#PicButton.SetEnabled>)
-  - [func \(p \*PicButton\) SetMinSize\(minSize fyne.Size\)](<#PicButton.SetMinSize>)
-  - [func \(p \*PicButton\) SetUImg\(uImg \[\]byte\) error](<#PicButton.SetUImg>)
-  - [func \(p \*PicButton\) SetUxImg\(uxImg \[\]byte\) error](<#PicButton.SetUxImg>)
-  - [func \(p \*PicButton\) Tapped\(ev \*fyne.PointEvent\)](<#PicButton.Tapped>)
-  - [func \(p \*PicButton\) TypedKey\(ev \*fyne.KeyEvent\)](<#PicButton.TypedKey>)
-  - [func \(p \*PicButton\) TypedRune\(r rune\)](<#PicButton.TypedRune>)
-- [type PicButtonRenderer](<#PicButtonRenderer>)
-  - [func \(r \*PicButtonRenderer\) Destroy\(\)](<#PicButtonRenderer.Destroy>)
-  - [func \(r \*PicButtonRenderer\) Layout\(size fyne.Size\)](<#PicButtonRenderer.Layout>)
-  - [func \(r \*PicButtonRenderer\) MinSize\(\) fyne.Size](<#PicButtonRenderer.MinSize>)
-  - [func \(r \*PicButtonRenderer\) Objects\(\) \[\]fyne.CanvasObject](<#PicButtonRenderer.Objects>)
-  - [func \(r \*PicButtonRenderer\) Refresh\(\)](<#PicButtonRenderer.Refresh>)
+- [PicButton for fyne](#picbutton-for-fyne)
+	- [Getting PicButton](#getting-picbutton)
+	- [Import PicButton](#import-picbutton)
+	- [Usage of PicButton](#usage-of-picbutton)
+	- [Screenshots from the example](#screenshots-from-the-example)
+	- [Docu](#docu)
+- [picbutton](#picbutton)
+	- [Index](#index)
+	- [type PicButton](#type-picbutton)
+		- [func NewPicButton](#func-newpicbutton)
+		- [func (\*PicButton) CreateRenderer](#func-picbutton-createrenderer)
+		- [func (\*PicButton) Cursor](#func-picbutton-cursor)
+		- [func (\*PicButton) FocusGained](#func-picbutton-focusgained)
+		- [func (\*PicButton) FocusLost](#func-picbutton-focuslost)
+		- [func (\*PicButton) GetLastKeyModifier](#func-picbutton-getlastkeymodifier)
+		- [func (\*PicButton) GetLastMouseButton](#func-picbutton-getlastmousebutton)
+		- [func (\*PicButton) IsDown](#func-picbutton-isdown)
+		- [func (\*PicButton) IsEnabled](#func-picbutton-isenabled)
+		- [func (\*PicButton) MouseDown](#func-picbutton-mousedown)
+		- [func (\*PicButton) MouseIn](#func-picbutton-mousein)
+		- [func (\*PicButton) MouseMoved](#func-picbutton-mousemoved)
+		- [func (\*PicButton) MouseOut](#func-picbutton-mouseout)
+		- [func (\*PicButton) MouseUp](#func-picbutton-mouseup)
+		- [func (\*PicButton) SetDImg](#func-picbutton-setdimg)
+		- [func (\*PicButton) SetDown](#func-picbutton-setdown)
+		- [func (\*PicButton) SetDxImg](#func-picbutton-setdximg)
+		- [func (\*PicButton) SetEnabled](#func-picbutton-setenabled)
+		- [func (\*PicButton) SetMinSize](#func-picbutton-setminsize)
+		- [func (\*PicButton) SetUImg](#func-picbutton-setuimg)
+		- [func (\*PicButton) SetUxImg](#func-picbutton-setuximg)
+		- [func (\*PicButton) Tapped](#func-picbutton-tapped)
+		- [func (\*PicButton) TypedKey](#func-picbutton-typedkey)
+		- [func (\*PicButton) TypedRune](#func-picbutton-typedrune)
+	- [type PicButtonRenderer](#type-picbuttonrenderer)
+		- [func (\*PicButtonRenderer) Destroy](#func-picbuttonrenderer-destroy)
+		- [func (\*PicButtonRenderer) Layout](#func-picbuttonrenderer-layout)
+		- [func (\*PicButtonRenderer) MinSize](#func-picbuttonrenderer-minsize)
+		- [func (\*PicButtonRenderer) Objects](#func-picbuttonrenderer-objects)
+		- [func (\*PicButtonRenderer) Refresh](#func-picbuttonrenderer-refresh)
+- [picbutton](#picbutton-1)
+	- [Index](#index-1)
+	- [type PicButton](#type-picbutton-1)
+		- [func NewPicButton](#func-newpicbutton-1)
+		- [func (\*PicButton) CreateRenderer](#func-picbutton-createrenderer-1)
+		- [func (\*PicButton) Cursor](#func-picbutton-cursor-1)
+		- [func (\*PicButton) FocusGained](#func-picbutton-focusgained-1)
+		- [func (\*PicButton) FocusLost](#func-picbutton-focuslost-1)
+		- [func (\*PicButton) GetLastkeyModifier](#func-picbutton-getlastkeymodifier-1)
+		- [func (\*PicButton) IsDown](#func-picbutton-isdown-1)
+		- [func (\*PicButton) IsEnabled](#func-picbutton-isenabled-1)
+		- [func (\*PicButton) MouseDown](#func-picbutton-mousedown-1)
+		- [func (\*PicButton) MouseIn](#func-picbutton-mousein-1)
+		- [func (\*PicButton) MouseMoved](#func-picbutton-mousemoved-1)
+		- [func (\*PicButton) MouseOut](#func-picbutton-mouseout-1)
+		- [func (\*PicButton) MouseUp](#func-picbutton-mouseup-1)
+		- [func (\*PicButton) SetDown](#func-picbutton-setdown-1)
+		- [func (\*PicButton) SetEnabled](#func-picbutton-setenabled-1)
+		- [func (\*PicButton) SetMinSize](#func-picbutton-setminsize-1)
+		- [func (\*PicButton) Tapped](#func-picbutton-tapped-1)
+		- [func (\*PicButton) TypedKey](#func-picbutton-typedkey-1)
+		- [func (\*PicButton) TypedRune](#func-picbutton-typedrune-1)
+	- [type PicButtonRenderer](#type-picbuttonrenderer-1)
+		- [func (\*PicButtonRenderer) Destroy](#func-picbuttonrenderer-destroy-1)
+		- [func (\*PicButtonRenderer) Layout](#func-picbuttonrenderer-layout-1)
+		- [func (\*PicButtonRenderer) MinSize](#func-picbuttonrenderer-minsize-1)
+		- [func (\*PicButtonRenderer) Objects](#func-picbuttonrenderer-objects-1)
+		- [func (\*PicButtonRenderer) Refresh](#func-picbuttonrenderer-refresh-1)
 
 
 <a name="PicButton"></a>
