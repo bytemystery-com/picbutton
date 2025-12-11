@@ -79,6 +79,7 @@ func main() {
 	w.ShowAndRun()
 }
 ```
+## Screenshots from the example
 ![alt text](/example/screenshots/01.png "Screenshot 01")
 ![alt text](/example/screenshots/02.png "Screenshot 02")
 ![alt text](/example/screenshots/03.png "Screenshot 03")
@@ -99,6 +100,7 @@ import "github.com/bytemystery-com/picbutton"
 	- [Getting PicButton](#getting-picbutton)
 	- [Import PicButton](#import-picbutton)
 	- [Usage of PicButton](#usage-of-picbutton)
+	- [Screenshots from the example](#screenshots-from-the-example)
 - [picbutton](#picbutton)
 	- [Index](#index)
 	- [type PicButton](#type-picbutton)
@@ -468,6 +470,7 @@ import "bytemystery.com/picbutton"
 	- [Getting PicButton](#getting-picbutton)
 	- [Import PicButton](#import-picbutton)
 	- [Usage of PicButton](#usage-of-picbutton)
+	- [Screenshots from the example](#screenshots-from-the-example)
 - [picbutton](#picbutton)
 	- [Index](#index)
 	- [type PicButton](#type-picbutton)
