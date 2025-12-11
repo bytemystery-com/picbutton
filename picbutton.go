@@ -67,7 +67,7 @@ type PicButton struct {
 	mouseDowninButton bool
 	isToggle          bool
 
-	onTapped func()
+	OnTapped func()
 }
 
 // creates a new picture button widget.
@@ -113,7 +113,7 @@ func NewPicButton(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle
 	}
 
 	w := &PicButton{
-		onTapped:       tapped,
+		OnTapped:       tapped,
 		img_u:          res_u,
 		img_d:          res_d,
 		img_ux:         res_ux,
@@ -167,8 +167,8 @@ func (p *PicButton) CreateRenderer() fyne.WidgetRenderer {
 // Tappable interface
 func (p *PicButton) Tapped(ev *fyne.PointEvent) {
 	if p.isEnabled && ((p.buttonMask & desktop.MouseButtonPrimary) != 0) {
-		if p.onTapped != nil {
-			p.onTapped()
+		if p.OnTapped != nil {
+			p.OnTapped()
 		}
 	}
 }
@@ -195,16 +195,16 @@ func (p *PicButton) MouseUp(ev *desktop.MouseEvent) {
 			p.stateIsDown = p.isDown
 			p.lastKeyModifier = ev.Modifier
 			p.lastMouseButton = ev.Button
-			if p.onTapped != nil && ((ev.Button & desktop.MouseButtonPrimary) == 0) {
-				p.onTapped()
+			if p.OnTapped != nil && ((ev.Button & desktop.MouseButtonPrimary) == 0) {
+				p.OnTapped()
 			}
 			p.Refresh()
 		} else {
-			if p.onTapped != nil {
+			if p.OnTapped != nil {
 				p.lastKeyModifier = ev.Modifier
 				p.lastMouseButton = ev.Button
 				if (ev.Button & desktop.MouseButtonPrimary) == 0 {
-					p.onTapped()
+					p.OnTapped()
 				}
 			}
 		}
@@ -259,8 +259,8 @@ func (p *PicButton) TypedKey(ev *fyne.KeyEvent) {
 		if p.isToggle {
 			p.SetDown(!p.IsDown())
 		}
-		if p.onTapped != nil {
-			p.onTapped()
+		if p.OnTapped != nil {
+			p.OnTapped()
 		}
 	}
 }
