@@ -17,12 +17,16 @@ Licence: MIT
 `import github.com/bytemystery-com/picbutton`
 
 ## Usage of PicButton
-`button := picbutton.NewPicButton(imgUp, imgDown, imgUpX, imgDownX, false, 0, func() {  
-	// Do what has to be done
-	})`
+```go
+button := picbutton.NewPicButton(imgUp, imgDown, imgUpX, imgDownX, false, 0,
+		func() {  
+			// Do what has to be done
+		})
+```
+
 
 Example:
-```
+```go
 package main
 
 import (
