@@ -3,13 +3,16 @@ package main
 import (
 	"embed"
 	"fmt"
+	"image/color"
 
 	"github.com/bytemystery-com/picbutton"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/widget"
 )
 
 //go:embed assets/*
@@ -19,6 +22,7 @@ func main() {
 	a := app.New()
 	w := a.NewWindow("PicButton")
 	w.SetFixedSize(true)
+	w.SetPadded(false)
 
 	imgPlayUp, _ := content.ReadFile("assets/play_u.png")
 	imgPlayDown, _ := content.ReadFile("assets/play_d.png")
@@ -50,7 +54,11 @@ func main() {
 	})
 	stop.SetEnabled(false)
 
-	x := container.NewHBox(play, stop)
-	w.SetContent(x)
+	bg := canvas.NewRectangle(color.NRGBA{R: 192, G: 192, B: 192, A: 255})
+	sep := widget.NewSeparator()
+	hbox := container.NewHBox(sep, play, stop, sep)
+	vbox := container.NewVBox(sep, hbox, sep)
+	w.SetContent(container.NewStack(bg, vbox))
+
 	w.ShowAndRun()
 }
