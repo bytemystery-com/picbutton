@@ -117,7 +117,8 @@ import "github.com/bytemystery-com/picbutton"
 ## Index
 
 - [type PicButton](<#PicButton>)
-  - [func NewPicButton\(uImg \[\]byte, dImg \[\]byte, uxImg \[\]byte, dxImg \[\]byte, isToggle bool, buttonMask desktop.MouseButton, tapped func\(\)\) \*PicButton](<#NewPicButton>)
+  - [func NewPicButton\(uImg \[\]byte, dImg \[\]byte, uxImg \[\]byte, dxImg \[\]byte, isToggle bool, tapped func\(\), tappedSecondary func\(\)\) \*PicButton](<#NewPicButton>)
+  - [func NewPicButtonEx\(uImg \[\]byte, dImg \[\]byte, uxImg \[\]byte, dxImg \[\]byte, isToggle bool, buttonMask desktop.MouseButton, tapped func\(\), tappedSecondary func\(\)\) \*PicButton](<#NewPicButtonEx>)
   - [func \(p \*PicButton\) CreateRenderer\(\) fyne.WidgetRenderer](<#PicButton.CreateRenderer>)
   - [func \(p \*PicButton\) Cursor\(\) desktop.Cursor](<#PicButton.Cursor>)
   - [func \(p \*PicButton\) FocusGained\(\)](<#PicButton.FocusGained>)
@@ -139,6 +140,7 @@ import "github.com/bytemystery-com/picbutton"
   - [func \(p \*PicButton\) SetUImg\(uImg \[\]byte\) error](<#PicButton.SetUImg>)
   - [func \(p \*PicButton\) SetUxImg\(uxImg \[\]byte\) error](<#PicButton.SetUxImg>)
   - [func \(p \*PicButton\) Tapped\(ev \*fyne.PointEvent\)](<#PicButton.Tapped>)
+  - [func \(p \*PicButton\) TappedSecondary\(ev \*fyne.PointEvent\)](<#PicButton.TappedSecondary>)
   - [func \(p \*PicButton\) TypedKey\(ev \*fyne.KeyEvent\)](<#PicButton.TypedKey>)
   - [func \(p \*PicButton\) TypedRune\(r rune\)](<#PicButton.TypedRune>)
 - [type PicButtonRenderer](<#PicButtonRenderer>)
@@ -158,7 +160,8 @@ import "github.com/bytemystery-com/picbutton"
 type PicButton struct {
     widget.BaseWidget
 
-    OnTapped func()
+    OnTapped          func()
+    OnTappedSecondary func()
     // contains filtered or unexported fields
 }
 ```
@@ -167,10 +170,19 @@ type PicButton struct {
 ### func NewPicButton
 
 ```go
-func NewPicButton(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, buttonMask desktop.MouseButton, tapped func()) *PicButton
+func NewPicButton(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, tapped func(), tappedSecondary func()) *PicButton
 ```
 
 creates a new picture button widget. At least uImg and dImg must be given If buttonMask is 0 then MouseButtonPrimary is used
+
+<a name="NewPicButtonEx"></a>
+### func NewPicButtonEx
+
+```go
+func NewPicButtonEx(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, buttonMask desktop.MouseButton, tapped func(), tappedSecondary func()) *PicButton
+```
+
+
 
 <a name="PicButton.CreateRenderer"></a>
 ### func \(\*PicButton\) CreateRenderer
@@ -360,6 +372,15 @@ func (p *PicButton) Tapped(ev *fyne.PointEvent)
 ```
 
 Tappable interface
+
+<a name="PicButton.TappedSecondary"></a>
+### func \(\*PicButton\) TappedSecondary
+
+```go
+func (p *PicButton) TappedSecondary(ev *fyne.PointEvent)
+```
+
+
 
 <a name="PicButton.TypedKey"></a>
 ### func \(\*PicButton\) TypedKey

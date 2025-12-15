@@ -48,13 +48,13 @@ import (
 type noCopy struct{}
 
 var (
-	_ fyne.Widget        = (*PicButton)(nil)
-	_ fyne.Tappable      = (*PicButton)(nil)
-	_ desktop.Mouseable  = (*PicButton)(nil)
-	_ desktop.Hoverable  = (*PicButton)(nil)
-	_ desktop.Cursorable = (*PicButton)(nil)
-	_ fyne.Focusable     = (*PicButton)(nil)
-	_ fyne.Tappable      = (*PicButton)(nil)
+	_ fyne.Widget            = (*PicButton)(nil)
+	_ fyne.Tappable          = (*PicButton)(nil)
+	_ fyne.SecondaryTappable = (*PicButton)(nil)
+	_ desktop.Mouseable      = (*PicButton)(nil)
+	_ desktop.Hoverable      = (*PicButton)(nil)
+	_ desktop.Cursorable     = (*PicButton)(nil)
+	_ fyne.Focusable         = (*PicButton)(nil)
 
 	_ fyne.WidgetRenderer = (*PicButtonRenderer)(nil)
 )
@@ -63,6 +63,7 @@ var (
 // Implements
 //   - fyne.Widget
 //   - fyne.Tappable
+//	 - yne.SecondaryTappable
 //   - fyne.Focusable
 //   - desktop.Mouseable
 //   - desktop.Hoverable
@@ -86,16 +87,21 @@ type PicButton struct {
 	isEnabled         bool
 	isDown            bool
 	stateIsDown       bool
-	mouseDowninButton bool
+	mouseDownInButton bool
 	isToggle          bool
 
-	OnTapped func()
+	OnTapped          func()
+	OnTappedSecondary func()
 }
 
 // creates a new picture button widget.
 // At least uImg and dImg must be given
 // If buttonMask is 0 then MouseButtonPrimary is used
-func NewPicButton(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, buttonMask desktop.MouseButton, tapped func()) *PicButton {
+func NewPicButton(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, tapped func(), tappedSecondary func()) *PicButton {
+	return NewPicButtonEx(uImg, dImg, uxImg, dxImg, isToggle, 0, tapped, tappedSecondary)
+}
+
+func NewPicButtonEx(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, buttonMask desktop.MouseButton, tapped func(), tappedSecondary func()) *PicButton {
 	if dImg == nil || uImg == nil {
 		return nil
 	}
@@ -131,17 +137,23 @@ func NewPicButton(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle
 	}
 	bm := buttonMask
 	if bm == 0 {
-		bm = desktop.MouseButtonPrimary
+		if tapped != nil {
+			bm = desktop.MouseButtonPrimary
+		}
+		if tappedSecondary != nil {
+			bm |= desktop.MouseButtonSecondary
+		}
 	}
 
 	w := &PicButton{
-		OnTapped:       tapped,
-		img_u:          res_u,
-		img_d:          res_d,
-		img_ux:         res_ux,
-		img_dx:         res_dx,
-		img_ux_created: ux_created,
-		img_dx_created: dx_created,
+		OnTapped:          tapped,
+		OnTappedSecondary: tappedSecondary,
+		img_u:             res_u,
+		img_d:             res_d,
+		img_ux:            res_ux,
+		img_dx:            res_dx,
+		img_ux_created:    ux_created,
+		img_dx_created:    dx_created,
 
 		minSize:    fyne.NewSize(float32(img.Bounds().Dx()), float32(img.Bounds().Dy())),
 		isToggle:   isToggle,
@@ -178,6 +190,7 @@ func createGray(buf []byte) []byte {
 func (p *PicButton) CreateRenderer() fyne.WidgetRenderer {
 	imgu := canvas.NewImageFromResource(p.img_u)
 	imgu.FillMode = canvas.ImageFillStretch
+	// imgu.ScaleMode = canvas.ImageScaleFastest
 	r := &PicButtonRenderer{
 		w:    p,
 		img:  imgu,
@@ -195,6 +208,14 @@ func (p *PicButton) Tapped(ev *fyne.PointEvent) {
 	}
 }
 
+func (p *PicButton) TappedSecondary(ev *fyne.PointEvent) {
+	if p.isEnabled && ((p.buttonMask & desktop.MouseButtonSecondary) != 0) {
+		if p.OnTappedSecondary != nil {
+			p.OnTappedSecondary()
+		}
+	}
+}
+
 // Mouseable interface
 func (p *PicButton) MouseDown(ev *desktop.MouseEvent) {
 	if p.isEnabled && ((ev.Button & p.buttonMask) != 0) {
@@ -204,7 +225,7 @@ func (p *PicButton) MouseDown(ev *desktop.MouseEvent) {
 			p.isDown = true
 		}
 		p.stateIsDown = p.isDown
-		p.mouseDowninButton = true
+		p.mouseDownInButton = true
 		p.Refresh()
 	}
 }
@@ -217,32 +238,32 @@ func (p *PicButton) MouseUp(ev *desktop.MouseEvent) {
 			p.stateIsDown = p.isDown
 			p.lastKeyModifier = ev.Modifier
 			p.lastMouseButton = ev.Button
-			if p.OnTapped != nil && ((ev.Button & desktop.MouseButtonPrimary) == 0) {
+			if p.OnTapped != nil && ((ev.Button & desktop.MouseButtonTertiary) != 0) {
 				p.OnTapped()
 			}
 			p.Refresh()
 		} else {
+			p.lastKeyModifier = ev.Modifier
+			p.lastMouseButton = ev.Button
 			if p.OnTapped != nil {
-				p.lastKeyModifier = ev.Modifier
-				p.lastMouseButton = ev.Button
-				if (ev.Button & desktop.MouseButtonPrimary) == 0 {
+				if (ev.Button & desktop.MouseButtonTertiary) != 0 {
 					p.OnTapped()
 				}
 			}
 		}
-		p.mouseDowninButton = false
+		p.mouseDownInButton = false
 	}
 }
 
 // Hoverable interface
 func (p *PicButton) MouseOut() {
 	if p.isEnabled {
-		if p.mouseDowninButton {
+		if p.mouseDownInButton {
 			if p.isDown {
 				p.isDown = false
 				p.Refresh()
 			}
-			p.mouseDowninButton = false
+			p.mouseDownInButton = false
 		}
 	}
 }
