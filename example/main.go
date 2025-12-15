@@ -26,6 +26,7 @@ import (
 	"embed"
 	"fmt"
 	"image/color"
+	"os"
 
 	"github.com/bytemystery-com/picbutton"
 
@@ -57,8 +58,13 @@ func main() {
 	imgStopUp, _ := content.ReadFile("assets/stop_u.png")
 	imgStopDown, _ := content.ReadFile("assets/stop_d.png")
 
+	imgExitUp, _ := content.ReadFile("assets/exit_u.png")
+	imgExitDown, _ := content.ReadFile("assets/exit_d.png")
+
 	var play *picbutton.PicButton
 	var stop *picbutton.PicButton
+	var exit1 *picbutton.PicButton
+	var exit2 *picbutton.PicButton
 	play = picbutton.NewPicButton(imgPlayUp, imgPlayDown, imgPlayUpX, imgPlayDownX, true,
 		func() {
 			fmt.Println("Play click primary", play.GetLastKeyModifier(), play.GetLastMouseButton())
@@ -68,7 +74,8 @@ func main() {
 			fmt.Println("Play click secondary", play.GetLastKeyModifier(), play.GetLastMouseButton())
 			stop.SetEnabled(play.IsDown())
 		})
-	stop = picbutton.NewPicButtonEx(imgStopUp, imgStopDown, nil, nil, false,
+	// desktop.MouseButtonTertiary
+	stop = picbutton.NewPicButtonEx(imgStopUp, imgStopDown, nil, nil, false, true,
 		desktop.MouseButtonPrimary|desktop.MouseButtonSecondary|desktop.MouseButtonTertiary,
 		func() {
 			str := "primary"
@@ -100,9 +107,23 @@ func main() {
 		})
 	stop.SetEnabled(false)
 
+	// without padding
+	exit1 = picbutton.NewPicButtonEx(imgExitUp, imgExitDown, nil, nil, false, false, 0,
+		func() {
+			exit2.SetEnabled(true)
+			exit1.SetEnabled(false)
+		}, nil)
+
+	// without padding
+	exit2 = picbutton.NewPicButtonEx(imgExitUp, imgExitDown, nil, nil, false, false, 0,
+		func() {
+			os.Exit(0)
+		}, nil)
+	exit2.SetEnabled(false)
+
 	bg := canvas.NewRectangle(color.NRGBA{R: 192, G: 192, B: 192, A: 255})
 	sep := widget.NewSeparator()
-	hbox := container.NewHBox(sep, play, stop, sep)
+	hbox := container.NewHBox(sep, play, stop, exit1, exit2, sep)
 	vbox := container.NewVBox(sep, hbox, sep)
 	w.SetContent(container.NewStack(bg, vbox))
 

@@ -5,7 +5,8 @@ if inactive pictures are missing they will be generated from the provided up and
 Pictures can be changed on the fly.  
 You can also specify which mouse button can be used to press / toggle the button.  
 Also the keyboard keyState and used Mouse button can be retrieved for implementing click + Ctrl  
-or right click + Shift.  
+or right click + Shift.
+You can also specify if the padding from the theme is used or displaying without a padding.
 
 Author: Reiner Pröls  
 Licence: MIT  
@@ -118,7 +119,7 @@ import "github.com/bytemystery-com/picbutton"
 
 - [type PicButton](<#PicButton>)
   - [func NewPicButton\(uImg \[\]byte, dImg \[\]byte, uxImg \[\]byte, dxImg \[\]byte, isToggle bool, tapped func\(\), tappedSecondary func\(\)\) \*PicButton](<#NewPicButton>)
-  - [func NewPicButtonEx\(uImg \[\]byte, dImg \[\]byte, uxImg \[\]byte, dxImg \[\]byte, isToggle bool, buttonMask desktop.MouseButton, tapped func\(\), tappedSecondary func\(\)\) \*PicButton](<#NewPicButtonEx>)
+  - [func NewPicButtonEx\(uImg \[\]byte, dImg \[\]byte, uxImg \[\]byte, dxImg \[\]byte, isToggle, hasPadding bool, buttonMask desktop.MouseButton, tapped func\(\), tappedSecondary func\(\)\) \*PicButton](<#NewPicButtonEx>)
   - [func \(p \*PicButton\) CreateRenderer\(\) fyne.WidgetRenderer](<#PicButton.CreateRenderer>)
   - [func \(p \*PicButton\) Cursor\(\) desktop.Cursor](<#PicButton.Cursor>)
   - [func \(p \*PicButton\) FocusGained\(\)](<#PicButton.FocusGained>)
@@ -173,16 +174,16 @@ type PicButton struct {
 func NewPicButton(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, tapped func(), tappedSecondary func()) *PicButton
 ```
 
-creates a new picture button widget. At least uImg and dImg must be given If buttonMask is 0 then MouseButtonPrimary is used
+creates a new picture button widget. At least uImg and dImg must be given
 
 <a name="NewPicButtonEx"></a>
 ### func NewPicButtonEx
 
 ```go
-func NewPicButtonEx(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, buttonMask desktop.MouseButton, tapped func(), tappedSecondary func()) *PicButton
+func NewPicButtonEx(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle, hasPadding bool, buttonMask desktop.MouseButton, tapped func(), tappedSecondary func()) *PicButton
 ```
 
-
+creates a new picture button widget. At least uImg and dImg must be given this function has 2 more parameters than NewPicButton you can switch off the padding and you can define a cutom MouseButtonMask \(if you want to use tertiray Mouse button e.g.\) If buttonMask is 0 then MouseButtonPrimary / MouseButtonSecondary is used automatically based on tapped \!= nil and tappedSecondary \!= nil
 
 <a name="PicButton.CreateRenderer"></a>
 ### func \(\*PicButton\) CreateRenderer

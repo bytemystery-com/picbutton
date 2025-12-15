@@ -27,6 +27,7 @@
 // You can also specify which mouse button can be used to press / toggle the button.
 // Also the keyboard keyState and used Mouse button can be retrieved for implementing click + Ctrl
 // or right click + Shift.
+// You can also specify if the padding from the theme is used or displaying without a padding.
 //
 // Author: Reiner Pröls
 // Licence: MIT
@@ -42,6 +43,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -89,6 +91,7 @@ type PicButton struct {
 	stateIsDown       bool
 	mouseDownInButton bool
 	isToggle          bool
+	hasPadding        bool
 
 	OnTapped          func()
 	OnTappedSecondary func()
@@ -96,12 +99,17 @@ type PicButton struct {
 
 // creates a new picture button widget.
 // At least uImg and dImg must be given
-// If buttonMask is 0 then MouseButtonPrimary is used
 func NewPicButton(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, tapped func(), tappedSecondary func()) *PicButton {
-	return NewPicButtonEx(uImg, dImg, uxImg, dxImg, isToggle, 0, tapped, tappedSecondary)
+	return NewPicButtonEx(uImg, dImg, uxImg, dxImg, isToggle, true, 0, tapped, tappedSecondary)
 }
 
-func NewPicButtonEx(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle bool, buttonMask desktop.MouseButton, tapped func(), tappedSecondary func()) *PicButton {
+// creates a new picture button widget.
+// At least uImg and dImg must be given
+// this function has 2 more parameters than NewPicButton
+// you can switch off the padding and
+// you can define a cutom MouseButtonMask (if you want to use tertiray Mouse button e.g.)
+// If buttonMask is 0 then MouseButtonPrimary / MouseButtonSecondary is used automatically based on tapped != nil and tappedSecondary != nil
+func NewPicButtonEx(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isToggle, hasPadding bool, buttonMask desktop.MouseButton, tapped func(), tappedSecondary func()) *PicButton {
 	if dImg == nil || uImg == nil {
 		return nil
 	}
@@ -145,6 +153,11 @@ func NewPicButtonEx(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isTogg
 		}
 	}
 
+	pad := theme.Padding()
+	if !hasPadding {
+		pad = 0
+	}
+
 	w := &PicButton{
 		OnTapped:          tapped,
 		OnTappedSecondary: tappedSecondary,
@@ -155,10 +168,11 @@ func NewPicButtonEx(uImg []byte, dImg []byte, uxImg []byte, dxImg []byte, isTogg
 		img_ux_created:    ux_created,
 		img_dx_created:    dx_created,
 
-		minSize:    fyne.NewSize(float32(img.Bounds().Dx()), float32(img.Bounds().Dy())),
+		minSize:    fyne.NewSize(float32(img.Bounds().Dx())+2*pad, float32(img.Bounds().Dy())+2*pad),
 		isToggle:   isToggle,
 		isEnabled:  true,
 		buttonMask: bm,
+		hasPadding: hasPadding,
 	}
 	w.ExtendBaseWidget(w)
 	return w
@@ -353,7 +367,11 @@ func (p *PicButton) GetLastMouseButton() desktop.MouseButton {
 
 // Override the automatic from uImg derived minSize
 func (p *PicButton) SetMinSize(minSize fyne.Size) {
-	p.minSize = minSize
+	pad := theme.Padding()
+	if !p.hasPadding {
+		pad = 0
+	}
+	p.minSize = minSize.Add(fyne.NewSize(2*pad, 2*pad))
 	p.Refresh()
 }
 
@@ -435,8 +453,12 @@ type PicButtonRenderer struct {
 
 // WidgetRenderer interface
 func (r *PicButtonRenderer) Layout(size fyne.Size) {
-	r.img.Resize(fyne.NewSize(size.Width, size.Height))
-	r.img.Move(fyne.NewPos(0, 0))
+	pad := theme.Padding()
+	if !r.w.hasPadding {
+		pad = 0
+	}
+	r.img.Resize(fyne.NewSize(size.Width-2*pad, size.Height-2*pad))
+	r.img.Move(fyne.NewPos(pad, pad))
 }
 
 // WidgetRenderer interface
