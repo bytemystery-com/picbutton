@@ -5,7 +5,7 @@ if inactive pictures are missing they will be generated from the provided up and
 Pictures can be changed on the fly.  
 You can also specify which mouse button can be used to press / toggle the button.  
 Also the keyboard keyState and used Mouse button can be retrieved for implementing click + Ctrl  
-or right click + Shift.
+or right click + Shift.  
 You can also specify if the padding from the theme is used or displaying without a padding.
 
 Author: Reiner Pröls  
@@ -23,21 +23,47 @@ import github.com/bytemystery-com/picbutton`
 
 ## Usage of PicButton
 ```go
-button := picbutton.NewPicButton(imgUp, imgDown, imgUpX, imgDownX, false, 0,
+button := picbutton.NewPicButton(imgUp, imgDown, imgUpX, imgDownX, false, 
 		func() {  
-			// Do what has to be done
+			// Do what has to be done by primary mouseclick
+		},
+		func() {  
+			// Do what has to be done by secondary mouseclick
 		})
 ```
 
 
 Example:
 ```go
+// Copyright (c) 2025 Reiner Pröls
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+// SPDX-License-Identifier: MIT
+
 package main
 
 import (
 	"embed"
 	"fmt"
 	"image/color"
+	"os"
 
 	"github.com/bytemystery-com/picbutton"
 
@@ -58,6 +84,8 @@ func main() {
 	w.SetFixedSize(true)
 	w.SetPadded(false)
 
+	w.CenterOnScreen()
+
 	imgPlayUp, _ := content.ReadFile("assets/play_u.png")
 	imgPlayDown, _ := content.ReadFile("assets/play_d.png")
 	imgPlay2Down, _ := content.ReadFile("assets/play2_d.png")
@@ -67,30 +95,72 @@ func main() {
 	imgStopUp, _ := content.ReadFile("assets/stop_u.png")
 	imgStopDown, _ := content.ReadFile("assets/stop_d.png")
 
+	imgExitUp, _ := content.ReadFile("assets/exit_u.png")
+	imgExitDown, _ := content.ReadFile("assets/exit_d.png")
+
 	var play *picbutton.PicButton
 	var stop *picbutton.PicButton
-	play = picbutton.NewPicButton(imgPlayUp, imgPlayDown, imgPlayUpX, imgPlayDownX, true, desktop.MouseButtonPrimary|desktop.MouseButtonSecondary|desktop.MouseButtonTertiary,
+	var exit1 *picbutton.PicButton
+	var exit2 *picbutton.PicButton
+	play = picbutton.NewPicButton(imgPlayUp, imgPlayDown, imgPlayUpX, imgPlayDownX, true,
 		func() {
-			fmt.Println("Play click", play.GetLastKeyModifier(), play.GetLastMouseButton())
+			fmt.Println("Play click primary", play.GetLastKeyModifier(), play.GetLastMouseButton())
+			stop.SetEnabled(play.IsDown())
+		},
+		func() {
+			fmt.Println("Play click secondary", play.GetLastKeyModifier(), play.GetLastMouseButton())
 			stop.SetEnabled(play.IsDown())
 		})
-	stop = picbutton.NewPicButton(imgStopUp, imgStopDown, nil, nil, false, desktop.MouseButtonPrimary|desktop.MouseButtonSecondary|desktop.MouseButtonTertiary, func() {
-		fmt.Println("Stop click", stop.GetLastKeyModifier(), stop.GetLastMouseButton())
+	// desktop.MouseButtonTertiary
+	stop = picbutton.NewPicButtonEx(imgStopUp, imgStopDown, nil, nil, false, true,
+		desktop.MouseButtonPrimary|desktop.MouseButtonSecondary|desktop.MouseButtonTertiary,
+		func() {
+			str := "primary"
+			if stop.GetLastMouseButton() == desktop.MouseButtonTertiary {
+				str = "tertiary"
+			}
+			fmt.Println("Stop click", str, stop.GetLastKeyModifier())
 
-		if stop.GetLastKeyModifier() == fyne.KeyModifierControl {
-			play.SetDImg(imgPlay2Down)
-		} else if stop.GetLastKeyModifier() == fyne.KeyModifierShift {
-			play.SetDImg(imgPlayDown)
-		} else {
-			play.SetDown(false)
-			stop.SetEnabled(false)
-		}
-	})
+			if stop.GetLastKeyModifier() == fyne.KeyModifierControl {
+				play.SetDImg(imgPlay2Down)
+			} else if stop.GetLastKeyModifier() == fyne.KeyModifierShift {
+				play.SetDImg(imgPlayDown)
+			} else {
+				play.SetDown(false)
+				stop.SetEnabled(false)
+			}
+		},
+		func() {
+			fmt.Println("Stop click secondary", stop.GetLastKeyModifier(), stop.GetLastMouseButton())
+
+			if stop.GetLastKeyModifier() == fyne.KeyModifierControl {
+				play.SetDImg(imgPlay2Down)
+			} else if stop.GetLastKeyModifier() == fyne.KeyModifierShift {
+				play.SetDImg(imgPlayDown)
+			} else {
+				play.SetDown(false)
+				stop.SetEnabled(false)
+			}
+		})
 	stop.SetEnabled(false)
+
+	// without padding
+	exit1 = picbutton.NewPicButtonEx(imgExitUp, imgExitDown, nil, nil, false, false, 0,
+		func() {
+			exit2.SetEnabled(true)
+			exit1.SetEnabled(false)
+		}, nil)
+
+	// without padding
+	exit2 = picbutton.NewPicButtonEx(imgExitUp, imgExitDown, nil, nil, false, false, 0,
+		func() {
+			os.Exit(0)
+		}, nil)
+	exit2.SetEnabled(false)
 
 	bg := canvas.NewRectangle(color.NRGBA{R: 192, G: 192, B: 192, A: 255})
 	sep := widget.NewSeparator()
-	hbox := container.NewHBox(sep, play, stop, sep)
+	hbox := container.NewHBox(sep, play, stop, exit1, exit2, sep)
 	vbox := container.NewVBox(sep, hbox, sep)
 	w.SetContent(container.NewStack(bg, vbox))
 
