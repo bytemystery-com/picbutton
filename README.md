@@ -451,7 +451,7 @@ Tappable interface
 func (p *PicButton) TappedSecondary(ev *fyne.PointEvent)
 ```
 
-
+SecondaryTappable interface
 
 <a name="PicButton.TypedKey"></a>
 ### func \(\*PicButton\) TypedKey

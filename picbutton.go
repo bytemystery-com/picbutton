@@ -222,6 +222,7 @@ func (p *PicButton) Tapped(ev *fyne.PointEvent) {
 	}
 }
 
+// SecondaryTappable interface
 func (p *PicButton) TappedSecondary(ev *fyne.PointEvent) {
 	if p.isEnabled && ((p.buttonMask & desktop.MouseButtonSecondary) != 0) {
 		if p.OnTappedSecondary != nil {
