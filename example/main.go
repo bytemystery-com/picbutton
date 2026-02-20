@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Reiner Pröls
+// Copyright (c) 2025-2016 Reiner Pröls
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,10 @@ func main() {
 	imgExitUp, _ := content.ReadFile("assets/exit_u.png")
 	imgExitDown, _ := content.ReadFile("assets/exit_d.png")
 
+	imgHoover, _ := content.ReadFile("assets/hoover.png")
+	imgHooverBottom, _ := content.ReadFile("assets/hoover_b.png")
+	imgHooverTop, _ := content.ReadFile("assets/hoover_t.png")
+
 	var play *picbutton.PicButton
 	var stop *picbutton.PicButton
 	var exit1 *picbutton.PicButton
@@ -121,9 +125,12 @@ func main() {
 		}, nil)
 	exit2.SetEnabled(false)
 
+	hoover := picbutton.NewPicButton(imgHoover, imgHoover, nil, nil, false, func() {}, nil)
+	hoover.SetHooverImg(imgHooverBottom, imgHooverTop)
+
 	bg := canvas.NewRectangle(color.NRGBA{R: 192, G: 192, B: 192, A: 255})
 	sep := widget.NewSeparator()
-	hbox := container.NewHBox(sep, play, stop, exit1, exit2, sep)
+	hbox := container.NewHBox(sep, play, stop, exit1, exit2, hoover, sep)
 	vbox := container.NewVBox(sep, hbox, sep)
 	w.SetContent(container.NewStack(bg, vbox))
 

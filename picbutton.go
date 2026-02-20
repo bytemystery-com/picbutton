@@ -75,16 +75,18 @@ type PicButton struct {
 	noCopy noCopy // so `go vet` can complain if a widget is passed by value (copied)
 
 	widget.BaseWidget
-	img_u           fyne.Resource
-	img_d           fyne.Resource
-	img_ux          fyne.Resource
-	img_dx          fyne.Resource
-	minSize         fyne.Size
-	buttonMask      desktop.MouseButton
-	lastKeyModifier fyne.KeyModifier
-	lastMouseButton desktop.MouseButton
-	img_ux_created  bool
-	img_dx_created  bool
+	img_u            fyne.Resource
+	img_d            fyne.Resource
+	img_ux           fyne.Resource
+	img_dx           fyne.Resource
+	img_hooverBottom fyne.Resource
+	img_hooverTop    fyne.Resource
+	minSize          fyne.Size
+	buttonMask       desktop.MouseButton
+	lastKeyModifier  fyne.KeyModifier
+	lastMouseButton  desktop.MouseButton
+	img_ux_created   bool
+	img_dx_created   bool
 
 	isEnabled         bool
 	isDown            bool
@@ -92,6 +94,7 @@ type PicButton struct {
 	mouseDownInButton bool
 	isToggle          bool
 	hasPadding        bool
+	mouseIn           bool
 
 	OnTapped          func()
 	OnTappedSecondary func()
@@ -205,10 +208,20 @@ func (p *PicButton) CreateRenderer() fyne.WidgetRenderer {
 	imgu := canvas.NewImageFromResource(p.img_u)
 	imgu.FillMode = canvas.ImageFillStretch
 	// imgu.ScaleMode = canvas.ImageScaleFastest
+
+	var imgHb *canvas.Image
+	var imgHt *canvas.Image
+	imgHb = canvas.NewImageFromResource(p.img_u)
+	imgHb.FillMode = canvas.ImageFillStretch
+	imgHt = canvas.NewImageFromResource(p.img_u)
+	imgHt.FillMode = canvas.ImageFillStretch
+	imgu.FillMode = canvas.ImageFillStretch
 	r := &PicButtonRenderer{
-		w:    p,
-		img:  imgu,
-		objs: []fyne.CanvasObject{imgu},
+		w:               p,
+		img:             imgu,
+		imgHooverBottom: imgHb,
+		imgHooverTop:    imgHt,
+		objs:            []fyne.CanvasObject{imgu},
 	}
 	return r
 }
@@ -281,10 +294,18 @@ func (p *PicButton) MouseOut() {
 			p.mouseDownInButton = false
 		}
 	}
+	if p.mouseIn {
+		p.mouseIn = false
+		p.Refresh()
+	}
 }
 
 // Hoverable interface
 func (p *PicButton) MouseIn(ev *desktop.MouseEvent) {
+	if !p.mouseIn {
+		p.mouseIn = true
+		p.Refresh()
+	}
 }
 
 // Hoverable interface
@@ -444,12 +465,30 @@ func (p *PicButton) SetDxImg(dxImg []byte) error {
 	return nil
 }
 
+// Sets a new hooverImg
+func (p *PicButton) SetHooverImg(hImgBottom []byte, hImgTop []byte) error {
+	if hImgBottom != nil {
+		p.img_hooverBottom = fyne.NewStaticResource("hoover_bottom_pic", hImgBottom)
+	} else {
+		p.img_hooverBottom = nil
+	}
+	if hImgTop != nil {
+		p.img_hooverTop = fyne.NewStaticResource("hoover_top_pic", hImgTop)
+	} else {
+		p.img_hooverTop = nil
+	}
+	p.Refresh()
+	return nil
+}
+
 // PicButtonRenderer implements:
 //   - fyne.WidgetRenderer
 type PicButtonRenderer struct {
-	w    *PicButton
-	img  *canvas.Image
-	objs []fyne.CanvasObject
+	w               *PicButton
+	img             *canvas.Image
+	imgHooverBottom *canvas.Image
+	imgHooverTop    *canvas.Image
+	objs            []fyne.CanvasObject
 }
 
 // WidgetRenderer interface
@@ -460,6 +499,10 @@ func (r *PicButtonRenderer) Layout(size fyne.Size) {
 	}
 	r.img.Resize(fyne.NewSize(size.Width-2*pad, size.Height-2*pad))
 	r.img.Move(fyne.NewPos(pad, pad))
+	r.imgHooverBottom.Resize(fyne.NewSize(size.Width-2*pad, size.Height-2*pad))
+	r.imgHooverBottom.Move(fyne.NewPos(pad, pad))
+	r.imgHooverTop.Resize(fyne.NewSize(size.Width-2*pad, size.Height-2*pad))
+	r.imgHooverTop.Move(fyne.NewPos(pad, pad))
 }
 
 // WidgetRenderer interface
@@ -475,14 +518,28 @@ func (r *PicButtonRenderer) Refresh() {
 		} else {
 			r.img.Resource = r.w.img_u
 		}
+		r.objs = []fyne.CanvasObject{}
+		if r.w.mouseIn {
+			if r.w.img_hooverBottom != nil {
+				r.imgHooverBottom.Resource = r.w.img_hooverBottom
+				r.objs = append(r.objs, r.imgHooverBottom)
+			}
+			r.objs = append(r.objs, r.img)
+			if r.w.img_hooverTop != nil {
+				r.imgHooverTop.Resource = r.w.img_hooverTop
+				r.objs = append(r.objs, r.imgHooverTop)
+			}
+		} else {
+			r.objs = append(r.objs, r.img)
+		}
 	} else {
 		if r.w.isDown {
 			r.img.Resource = r.w.img_dx
 		} else {
 			r.img.Resource = r.w.img_ux
 		}
+		r.objs = []fyne.CanvasObject{r.img}
 	}
-	r.objs = []fyne.CanvasObject{r.img}
 	r.img.Refresh()
 }
 

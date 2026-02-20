@@ -7,6 +7,7 @@ You can also specify which mouse button can be used to press / toggle the button
 Also the keyboard keyState and used Mouse button can be retrieved for implementing click + Ctrl  
 or right click + Shift.  
 You can also specify if the padding from the theme is used or displaying without a padding.
+Hoover function was added.
 
 Author: Reiner Pröls  
 Licence: MIT  
@@ -35,7 +36,7 @@ button := picbutton.NewPicButton(imgUp, imgDown, imgUpX, imgDownX, false,
 
 Example:
 ```go
-// Copyright (c) 2025 Reiner Pröls
+// Copyright (c) 2025-2016 Reiner Pröls
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -98,6 +99,10 @@ func main() {
 	imgExitUp, _ := content.ReadFile("assets/exit_u.png")
 	imgExitDown, _ := content.ReadFile("assets/exit_d.png")
 
+	imgHoover, _ := content.ReadFile("assets/hoover.png")
+	imgHooverBottom, _ := content.ReadFile("assets/hoover_b.png")
+	imgHooverTop, _ := content.ReadFile("assets/hoover_t.png")
+
 	var play *picbutton.PicButton
 	var stop *picbutton.PicButton
 	var exit1 *picbutton.PicButton
@@ -158,9 +163,12 @@ func main() {
 		}, nil)
 	exit2.SetEnabled(false)
 
+	hoover := picbutton.NewPicButton(imgHoover, imgHoover, nil, nil, false, func() {}, nil)
+	hoover.SetHooverImg(imgHooverBottom, imgHooverTop)
+
 	bg := canvas.NewRectangle(color.NRGBA{R: 192, G: 192, B: 192, A: 255})
 	sep := widget.NewSeparator()
-	hbox := container.NewHBox(sep, play, stop, exit1, exit2, sep)
+	hbox := container.NewHBox(sep, play, stop, exit1, exit2, hoover, sep)
 	vbox := container.NewVBox(sep, hbox, sep)
 	w.SetContent(container.NewStack(bg, vbox))
 
@@ -172,6 +180,7 @@ func main() {
 ![alt text](/example/screenshots/01.png "Screenshot 01")
 ![alt text](/example/screenshots/02.png "Screenshot 02")
 ![alt text](/example/screenshots/03.png "Screenshot 03")
+![alt text](/example/screenshots/04.png "Screenshot 04")
 
 ## Docu 
 
@@ -207,6 +216,7 @@ import "github.com/bytemystery-com/picbutton"
   - [func \(b \*PicButton\) SetDown\(bDown bool\)](<#PicButton.SetDown>)
   - [func \(p \*PicButton\) SetDxImg\(dxImg \[\]byte\) error](<#PicButton.SetDxImg>)
   - [func \(b \*PicButton\) SetEnabled\(bEnabled bool\)](<#PicButton.SetEnabled>)
+  - [func \(p \*PicButton\) SetHooverImg\(hImgBottom \[\]byte, hImgTop \[\]byte\) error](<#PicButton.SetHooverImg>)
   - [func \(p \*PicButton\) SetMinSize\(minSize fyne.Size\)](<#PicButton.SetMinSize>)
   - [func \(p \*PicButton\) SetUImg\(uImg \[\]byte\) error](<#PicButton.SetUImg>)
   - [func \(p \*PicButton\) SetUxImg\(uxImg \[\]byte\) error](<#PicButton.SetUxImg>)
@@ -407,6 +417,15 @@ func (b *PicButton) SetEnabled(bEnabled bool)
 ```
 
 Sets the button enabled / disabled
+
+<a name="PicButton.SetHooverImg"></a>
+### func \(\*PicButton\) SetHooverImg
+
+```go
+func (p *PicButton) SetHooverImg(hImgBottom []byte, hImgTop []byte) error
+```
+
+Sets a new hooverImg
 
 <a name="PicButton.SetMinSize"></a>
 ### func \(\*PicButton\) SetMinSize
