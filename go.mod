@@ -2,7 +2,7 @@ module github.com/bytemystery-com/picbutton
 
 go 1.25.5
 
-require fyne.io/fyne/v2 v2.7.2
+require fyne.io/fyne/v2 v2.7.3
 
 require (
 	fyne.io/systray v1.12.0 // indirect

@@ -95,6 +95,7 @@ type PicButton struct {
 	isToggle          bool
 	hasPadding        bool
 	mouseIn           bool
+	toogleDoneByMouse bool
 
 	OnTapped          func()
 	OnTappedSecondary func()
@@ -230,6 +231,14 @@ func (p *PicButton) CreateRenderer() fyne.WidgetRenderer {
 func (p *PicButton) Tapped(ev *fyne.PointEvent) {
 	if p.isEnabled && ((p.buttonMask & desktop.MouseButtonPrimary) != 0) {
 		if p.OnTapped != nil {
+			if p.isToggle {
+				if !p.toogleDoneByMouse {
+					p.isDown = !p.isDown
+					p.Refresh()
+				} else {
+					p.toogleDoneByMouse = false
+				}
+			}
 			p.OnTapped()
 		}
 	}
@@ -249,6 +258,7 @@ func (p *PicButton) MouseDown(ev *desktop.MouseEvent) {
 	if p.isEnabled && ((ev.Button & p.buttonMask) != 0) {
 		if p.isToggle {
 			p.isDown = !p.isDown
+			p.toogleDoneByMouse = true
 		} else {
 			p.isDown = true
 		}
